@@ -7,9 +7,6 @@ from bs4 import BeautifulSoup
 
 import re 
 
-leaders_per_country = {}
-
-
 def get_leaders():
     #determining URLS 
     root_url = 'https://country-leaders.onrender.com'
@@ -24,6 +21,7 @@ def get_leaders():
     #getting the different countries
     countri = s.get( root_url+country_url, cookies=cookies)
     countries = countri.json()
+    leaders_per_country = {}
     #creation of the final dictionary
     #looping trough each country to find the different leaders
     for country in countries: 
@@ -41,7 +39,6 @@ def get_leaders():
             #using the function to retrieve the first paragraph of each page
             para = get_first_paragraph(wtf,s)
             leader["first_paragraph"] = para
-
     return leaders_per_country
 
 #creation of a cache decorator
@@ -69,12 +66,11 @@ def get_first_paragraph(url,session):
             cleaned_3= re.sub(r'\n','',cleaned_2)
 
             return cleaned_3
-
 #creating the final file with the content of the scraping
-def save_json(content, file_name):
-    leaders = f"./{file_name}.json"
+def save(content : dict, name: str) :
+    leaders = f"./{name}.json"
     with open(leaders, 'w') as file:
-        file.write(str(content))
+        json.dump(content, file, indent=4)
 
-get_leaders()
-save_json(leaders_per_country, "test")
+final = get_leaders()
+save(final, "leaders_countries")
